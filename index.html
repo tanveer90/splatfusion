@@ -474,87 +474,73 @@
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       ABSTRACT
-<section id="abstract">
+ <section id="abstract">
   <div class="container">
-    <h2 style="
+    <div class="section-label">01 — Abstract</div>
+    <h2>Abstract</h2>
+
+    <p style="
       font-family: var(--font-serif);
-      font-size: clamp(1.4rem, 2.5vw, 2rem);
-      font-weight: 600;
-      letter-spacing: -0.01em;
+      font-size: 1.13rem;
+      line-height: 1.9;
       color: var(--ink);
+      text-align: justify;
+      hyphens: auto;
+      max-width: 100%;
       margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--border);
-    ">Abstract</h2>
+    ">
+      Reconstructing complete 3D scenes from extremely sparse viewpoints (e.g., 2–3 wide-baseline
+      images) remains a core yet unsolved challenge. Existing 3D Gaussian Splatting (3DGS) and
+      neural rendering methods degrade severely when view overlap is limited, often producing
+      incomplete or geometrically distorted results. We introduce <strong>SplatFusion</strong>,
+      a reconstruction framework that requires <strong>no training or fine-tuning</strong> of
+      diffusion models, instead relying solely on pretrained video diffusion priors to synthesize
+      missing scene content plausibly. Our core idea is a
+      <strong>Scene-Consistent Temporal Guidance (SCTG)</strong> mechanism that tightly couples
+      3D structure with generative diffusion models. SCTG conditions video diffusion on sequences
+      rendered from the evolving 3DGS representation, enforcing both spatial alignment with geometry
+      and temporal coherence across synthesized frames. These refined views are back-projected to
+      densify and correct the 3D scene iteratively. Extensive experiments on diverse real-world
+      datasets demonstrate that SplatFusion consistently outperforms existing sparse-view
+      reconstruction methods across perceptual quality and geometric consistency metrics.
+    </p>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start;">
-      
-      <!-- Left: text -->
-      <p style="
-        font-family: var(--font-serif);
-        font-size: 1.13rem;
-        line-height: 1.9;
-        color: var(--ink);
-        text-align: justify;
-        hyphens: auto;
-      ">
-        Reconstructing complete 3D scenes from extremely sparse viewpoints (e.g., 2–3 wide-baseline
-        images) remains a core yet unsolved challenge. Existing 3D Gaussian Splatting (3DGS) and
-        neural rendering methods degrade severely when view overlap is limited, often producing
-        incomplete or geometrically distorted results. We introduce <strong>SplatFusion</strong>,
-        a reconstruction framework that requires <strong>no training or fine-tuning</strong> of
-        diffusion models, instead relying solely on pretrained video diffusion priors to synthesize
-        missing scene content plausibly. Our core idea is a
-        <strong>Scene-Consistent Temporal Guidance (SCTG)</strong> mechanism that tightly couples
-        3D structure with generative diffusion models. SCTG conditions video diffusion on sequences
-        rendered from the evolving 3DGS representation, enforcing both spatial alignment with geometry
-        and temporal coherence across synthesized frames. These refined views are back-projected to
-        densify and correct the 3D scene iteratively. Extensive experiments on diverse real-world
-        datasets demonstrate that SplatFusion consistently outperforms existing sparse-view
-        reconstruction methods across perceptual quality and geometric consistency metrics.
-      </p>
-
-      <!-- Right: keyword tags + key claims -->
-      <div>
-        <p style="font-family:var(--font-mono); font-size:0.68rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:0.9rem;">Keywords</p>
-        <div style="display:flex; flex-wrap:wrap; gap:0.55rem; margin-bottom:2.5rem;">
-          <span class="pill">Training-Free</span>
-          <span class="pill">3D Gaussian Splatting</span>
-          <span class="pill">Video Diffusion Priors</span>
-          <span class="pill pill-warm">2–3 Input Images</span>
-          <span class="pill">Temporal Coherence</span>
-          <span class="pill">Novel View Synthesis</span>
-          <span class="pill">Wide-Baseline Reconstruction</span>
-          <span class="pill">Sparse Views</span>
-        </div>
-
-        <p style="font-family:var(--font-mono); font-size:0.68rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:0.9rem;">Key Contributions</p>
-        <div style="display:flex; flex-direction:column; gap:0.7rem;">
-          <div style="display:flex; gap:0.8rem; align-items:flex-start;">
-            <span style="color:var(--accent); font-family:var(--font-mono); font-size:0.75rem; margin-top:0.1rem; flex-shrink:0;">01</span>
-            <p style="font-size:0.85rem; color:var(--ink-muted); line-height:1.55;">First training-free method for extreme sparse-view 3D reconstruction from 2–3 wide-baseline images.</p>
-          </div>
-          <div style="display:flex; gap:0.8rem; align-items:flex-start;">
-            <span style="color:var(--accent); font-family:var(--font-mono); font-size:0.75rem; margin-top:0.1rem; flex-shrink:0;">02</span>
-            <p style="font-size:0.85rem; color:var(--ink-muted); line-height:1.55;">Novel SCTG mechanism enforcing spatial and temporal consistency via 3DGS-conditioned diffusion guidance.</p>
-          </div>
-          <div style="display:flex; gap:0.8rem; align-items:flex-start;">
-            <span style="color:var(--accent); font-family:var(--font-mono); font-size:0.75rem; margin-top:0.1rem; flex-shrink:0;">03</span>
-            <p style="font-size:0.85rem; color:var(--ink-muted); line-height:1.55;">3D-aware visibility-masked guidance loss enabling robust structural densification in unobserved regions.</p>
-          </div>
-          <div style="display:flex; gap:0.8rem; align-items:flex-start;">
-            <span style="color:var(--accent); font-family:var(--font-mono); font-size:0.75rem; margin-top:0.1rem; flex-shrink:0;">04</span>
-            <p style="font-size:0.85rem; color:var(--ink-muted); line-height:1.55;">State-of-the-art results on Tanks &amp; Temples, MipNeRF360, and DL3DV-10K benchmarks.</p>
-          </div>
-        </div>
-      </div>
-
+    <!-- Keywords -->
+    <p style="font-family:var(--font-mono); font-size:0.68rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:0.75rem;">Keywords</p>
+    <div style="display:flex; flex-wrap:wrap; gap:0.55rem; margin-bottom:2.5rem;">
+      <span class="pill">Training-Free</span>
+      <span class="pill">3D Gaussian Splatting</span>
+      <span class="pill">Video Diffusion Priors</span>
+      <span class="pill pill-warm">2–3 Input Images</span>
+      <span class="pill">Temporal Coherence</span>
+      <span class="pill">Novel View Synthesis</span>
+      <span class="pill">Wide-Baseline Reconstruction</span>
+      <span class="pill">Sparse Views</span>
     </div>
+
+    <!-- Contributions -->
+    <p style="font-family:var(--font-mono); font-size:0.68rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:0.9rem;">Key Contributions</p>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:1rem;">
+      <div style="display:flex; gap:0.9rem; align-items:flex-start; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:1rem 1.1rem;">
+        <span style="color:var(--accent); font-family:var(--font-mono); font-size:0.75rem; margin-top:0.1rem; flex-shrink:0;">01</span>
+        <p style="font-size:0.84rem; color:var(--ink-muted); line-height:1.6;">First training-free method for extreme sparse-view 3D reconstruction from 2–3 wide-baseline images.</p>
+      </div>
+      <div style="display:flex; gap:0.9rem; align-items:flex-start; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:1rem 1.1rem;">
+        <span style="color:var(--accent); font-family:var(--font-mono); font-size:0.75rem; margin-top:0.1rem; flex-shrink:0;">02</span>
+        <p style="font-size:0.84rem; color:var(--ink-muted); line-height:1.6;">Novel SCTG mechanism enforcing spatial and temporal consistency via 3DGS-conditioned diffusion guidance.</p>
+      </div>
+      <div style="display:flex; gap:0.9rem; align-items:flex-start; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:1rem 1.1rem;">
+        <span style="color:var(--accent); font-family:var(--font-mono); font-size:0.75rem; margin-top:0.1rem; flex-shrink:0;">03</span>
+        <p style="font-size:0.84rem; color:var(--ink-muted); line-height:1.6;">3D-aware visibility-masked guidance loss enabling robust structural densification in unobserved regions.</p>
+      </div>
+      <div style="display:flex; gap:0.9rem; align-items:flex-start; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:1rem 1.1rem;">
+        <span style="color:var(--accent); font-family:var(--font-mono); font-size:0.75rem; margin-top:0.1rem; flex-shrink:0;">04</span>
+        <p style="font-size:0.84rem; color:var(--ink-muted); line-height:1.6;">State-of-the-art results on Tanks &amp; Temples, MipNeRF360, and DL3DV-10K benchmarks.</p>
+      </div>
+    </div>
+
   </div>
 </section>
-
   <!-- ═══════════════════════════════════════════════════════════════
        METHOD
   ═══════════════════════════════════════════════════════════════════ -->
