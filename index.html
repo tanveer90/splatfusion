@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SplatFusion: Training-Free 3D Scene Completion</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── TOKENS ─────────────────────────────────────────────────── */
+    :root {
+      --bg:          #fafaf8;
+      --surface:     #ffffff;
+      --border:      #e8e4dd;
+      --ink:         #1a1814;
+      --ink-muted:   #6b6560;
+      --ink-faint:   #a09890;
+      --accent:      #2d5be3;
+      --accent-warm: #c04b1e;
+      --tag-bg:      #eef2fc;
+      --tag-text:    #2d5be3;
+
+      --font-serif:  'Crimson Pro', Georgia, serif;
+      --font-sans:   'DM Sans', sans-serif;
+      --font-mono:   'DM Mono', monospace;
+
+      --max-w: 860px;
+      --col-gap: 2rem;
+    }
+
+    /* ─── RESET ──────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 17px; scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-weight: 300;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── LAYOUT ─────────────────────────────────────────────────── */
+    .container { max-width: var(--max-w); margin: 0 auto; padding: 0 1.5rem; }
+
+    /* ─── TOP RULE ───────────────────────────────────────────────── */
+    .top-rule {
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent-warm) 100%);
+    }
+
+    /* ─── HEADER ─────────────────────────────────────────────────── */
+    header {
+      padding: 4rem 0 3rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .venue-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--tag-text);
+      background: var(--tag-bg);
+      border: 1px solid #c7d4f7;
+      padding: 0.2em 0.8em;
+      border-radius: 3px;
+      margin-bottom: 1.6rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      line-height: 1.22;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      max-width: 680px;
+      margin: 0 auto 2rem;
+    }
+    h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    /* Authors */
+    .authors {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.4rem 1.6rem;
+      margin-bottom: 1.2rem;
+    }
+    .author {
+      font-size: 1.0rem;
+      font-weight: 400;
+      color: var(--ink);
+    }
+    .author sup { font-size: 0.65em; color: var(--accent); margin-left: 1px; }
+    .author a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--border); transition: border-color 0.2s; }
+    .author a:hover { border-color: var(--accent); color: var(--accent); }
+    .affiliations {
+      font-size: 0.82rem;
+      color: var(--ink-muted);
+      margin-bottom: 2rem;
+      line-height: 1.9;
+    }
+    .affiliations sup { font-size: 0.7em; color: var(--accent); margin-right: 2px; }
+
+    /* ─── LINKS ROW ──────────────────────────────────────────────── */
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.7rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4em;
+      font-family: var(--font-sans);
+      font-size: 0.82rem;
+      font-weight: 500;
+      padding: 0.45em 1.1em;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: all 0.18s;
+      border: 1.5px solid;
+    }
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover { background: #1d44c0; border-color: #1d44c0; }
+    .btn-outline {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--ink-muted);
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+    .btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* ─── SECTIONS ───────────────────────────────────────────────── */
+    section { padding: 4rem 0; border-bottom: 1px solid var(--border); }
+    section:last-of-type { border-bottom: none; }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 0.5rem;
+    }
+    h2 {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      font-size: 1.55rem;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      margin-bottom: 1.5rem;
+    }
+
+    /* ─── ABSTRACT ───────────────────────────────────────────────── */
+    .abstract-body {
+      font-family: var(--font-serif);
+      font-size: 1.13rem;
+      line-height: 1.85;
+      color: var(--ink);
+      max-width: 720px;
+    }
+    .abstract-body strong {
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    /* ─── HIGHLIGHT PILLS ────────────────────────────────────────── */
+    .highlights {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1.8rem;
+    }
+    .pill {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+      padding: 0.3em 0.9em;
+      border-radius: 20px;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      border: 1px solid #c7d4f7;
+    }
+    .pill-warm {
+      background: #fdf0eb;
+      color: var(--accent-warm);
+      border-color: #f0c4ae;
+    }
+
+    /* ─── FIGURE / PLACEHOLDER ───────────────────────────────────── */
+    .figure-wrap {
+      margin: 0;
+      width: 100%;
+    }
+    .figure-wrap figcaption {
+      margin-top: 0.9rem;
+      font-size: 0.83rem;
+      color: var(--ink-muted);
+      line-height: 1.55;
+    }
+    .figure-wrap figcaption strong { color: var(--ink); font-weight: 500; }
+
+    /* Placeholder boxes */
+    .placeholder {
+      width: 100%;
+      background: var(--surface);
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      color: var(--ink-faint);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      transition: border-color 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .placeholder::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 8px,
+        rgba(0,0,0,0.018) 8px,
+        rgba(0,0,0,0.018) 16px
+      );
+    }
+    .placeholder:hover { border-color: var(--accent); }
+    .placeholder-icon { font-size: 1.6rem; position: relative; z-index: 1; }
+    .placeholder-label { position: relative; z-index: 1; text-align: center; padding: 0 1rem; }
+    .placeholder-sub {
+      position: relative; z-index: 1;
+      font-size: 0.68rem;
+      color: var(--ink-faint);
+      opacity: 0.7;
+    }
+
+    /* Heights */
+    .ph-diagram  { height: 360px; }
+    .ph-results  { height: 420px; }
+    .ph-video    { height: 320px; aspect-ratio: 16/9; }
+    .ph-compare  { height: 300px; }
+
+    /* ─── VIDEO GRID ─────────────────────────────────────────────── */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.2rem;
+    }
+    .video-item figcaption {
+      margin-top: 0.5rem;
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      text-align: center;
+    }
+
+    /* ─── COMPARISON GRID ────────────────────────────────────────── */
+    .compare-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+    .compare-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+      align-items: start;
+    }
+    .compare-row .method-label {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+      margin-top: 0.4rem;
+      text-transform: uppercase;
+    }
+    .compare-row .method-label.ours {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* ─── METRICS STRIP ──────────────────────────────────────────── */
+    .metrics-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 2.5rem;
+    }
+    .metric-cell {
+      padding: 1.1rem 1.2rem;
+      border-right: 1px solid var(--border);
+      text-align: center;
+    }
+    .metric-cell:last-child { border-right: none; }
+    .metric-val {
+      font-family: var(--font-serif);
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--accent);
+      display: block;
+      line-height: 1;
+    }
+    .metric-name {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-top: 0.35rem;
+      display: block;
+    }
+    .metric-note {
+      font-size: 0.7rem;
+      color: var(--ink-faint);
+      display: block;
+    }
+
+    /* ─── PIPELINE STEPS ─────────────────────────────────────────── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 2.5rem;
+    }
+    .step-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem 1.1rem;
+      position: relative;
+    }
+    .step-num {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    .step-title {
+      font-weight: 500;
+      font-size: 0.88rem;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+    }
+    .step-desc {
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      line-height: 1.55;
+    }
+
+    /* ─── FOOTER ─────────────────────────────────────────────────── */
+    footer {
+      padding: 2.5rem 0;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--ink-faint);
+      font-family: var(--font-mono);
+      letter-spacing: 0.04em;
+    }
+    footer a { color: var(--ink-faint); text-decoration: none; border-bottom: 1px solid var(--border); }
+    footer a:hover { color: var(--accent); border-color: var(--accent); }
+
+    /* ─── ANIMATIONS ─────────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    header > * { animation: fadeUp 0.55s ease both; }
+    header .venue-tag { animation-delay: 0.0s; }
+    header h1         { animation-delay: 0.08s; }
+    header .authors   { animation-delay: 0.16s; }
+    header .affiliations { animation-delay: 0.22s; }
+    header .links     { animation-delay: 0.3s; }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .compare-row { grid-template-columns: repeat(2, 1fr); }
+      .compare-row figure:nth-child(n+3) { display: none; }
+      .metric-cell { padding: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-rule"></div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       HEADER
+  ═══════════════════════════════════════════════════════════════════ -->
+  <header>
+    <div class="container">
+      <div class="venue-tag">Preprint &nbsp;·&nbsp; 2025</div>
+
+      <h1>
+        <em>SplatFusion:</em> Training-Free 3D Scene Completion from Sparse&nbsp;Views Using Temporal Diffusion&nbsp;Priors and Gaussian&nbsp;Splatting
+      </h1>
+
+      <div class="authors">
+        <span class="author"><a href="#">Tanveer Younis</a><sup>1</sup></span>
+        <span class="author"><a href="#">Dawar Khan</a><sup>2</sup></span>
+        <span class="author"><a href="#">Zhanglin Cheng</a><sup>1</sup> *</span>
+      </div>
+
+      <div class="affiliations">
+        <sup>1</sup> Shenzhen VisuCA Key Lab, Shenzhen Institutes of Advanced Technology, Chinese Academy of Sciences, China
+        &nbsp;&nbsp;·&nbsp;&nbsp;
+        <sup>2</sup> King Abdullah University of Science and Technology, Saudi Arabia
+        <br />* Corresponding author
+      </div>
+
+      <div class="links">
+        <a class="btn btn-primary" href="[PAPER_URL]">
+          <!-- paper icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Paper
+        </a>
+        <a class="btn btn-outline" href="[ARXIV_URL]">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          arXiv
+        </a>
+        <a class="btn btn-outline" href="[CODE_URL]">
+          <!-- github icon -->
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+          Code
+        </a>
+        <a class="btn btn-outline" href="[DEMO_URL]">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          Demo
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       TEASER / HERO IMAGE
+  ═══════════════════════════════════════════════════════════════════ -->
+  <section style="padding: 3rem 0;">
+    <div class="container">
+      <figure class="figure-wrap">
+        <!-- ★ REPLACE: swap the placeholder div below with an <img> or <video> of your teaser figure -->
+        <div class="placeholder ph-results" style="height:420px;">
+          <span class="placeholder-icon">🎬</span>
+          <span class="placeholder-label">Teaser Video or Figure</span>
+          <span class="placeholder-sub">Replace with &lt;video&gt; or &lt;img src="static/teaser.mp4"&gt;</span>
+        </div>
+        <figcaption>
+          <strong>SplatFusion</strong> reconstructs complete 3D scenes from as few as 2–3 wide-baseline input images
+          (top-left). Our Scene-Consistent Temporal Guidance (SCTG) mechanism guides a pretrained video diffusion
+          model to fill missing regions while maintaining strict geometric and temporal consistency, yielding
+          photorealistic novel-view synthesis (right) where prior methods fail.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       ABSTRACT
+  ═══════════════════════════════════════════════════════════════════ -->
+  <section id="abstract">
+    <div class="container">
+      <div class="section-label">01 — Abstract</div>
+      <h2>Overview</h2>
+
+      <p class="abstract-body">
+        Reconstructing complete 3D scenes from extremely sparse viewpoints (e.g., 2–3 wide-baseline images) remains
+        a core yet unsolved challenge. Existing 3D Gaussian Splatting (3DGS) and neural rendering methods degrade
+        severely when view overlap is limited, often producing incomplete or geometrically distorted results. We introduce
+        <strong>SplatFusion</strong>, a reconstruction framework that requires <strong>no training or fine-tuning</strong> of
+        diffusion models, instead relying solely on pretrained video diffusion priors to synthesize missing scene content
+        plausibly. Our core idea is a <strong>Scene-Consistent Temporal Guidance (SCTG)</strong> mechanism that tightly
+        couples 3D structure with generative diffusion models. Specifically, SCTG conditions video diffusion on sequences
+        rendered from the evolving 3DGS representation, enforcing both spatial alignment with geometry and temporal
+        coherence across synthesized frames. These refined views are back-projected to densify and correct the 3D scene
+        iteratively. Extensive experiments on diverse real-world datasets demonstrate that SplatFusion consistently
+        outperforms existing sparse-view reconstruction methods across perceptual quality and geometric consistency metrics.
+      </p>
+
+      <div class="highlights">
+        <span class="pill">Training-Free</span>
+        <span class="pill">3D Gaussian Splatting</span>
+        <span class="pill">Video Diffusion Priors</span>
+        <span class="pill pill-warm">2–3 Input Images</span>
+        <span class="pill">Temporal Coherence</span>
+        <span class="pill">Novel View Synthesis</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       METHOD
+  ═══════════════════════════════════════════════════════════════════ -->
+  <section id="method">
+    <div class="container">
+      <div class="section-label">02 — Method</div>
+      <h2>Pipeline Overview</h2>
+
+      <!-- Pipeline step cards -->
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-num">STEP 01</div>
+          <div class="step-title">Geometry Initialization</div>
+          <div class="step-desc">Estimate camera poses and initialize a coarse 3DGS model from 2–3 unposed images via DUST3R / MASt3R geometric priors.</div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">STEP 02</div>
+          <div class="step-title">Camera Trajectory</div>
+          <div class="step-desc">Construct a smooth B-spline camera trajectory that interpolates between sparse input poses to generate dense virtual viewpoints.</div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">STEP 03</div>
+          <div class="step-title">SCTG Refinement</div>
+          <div class="step-desc">Guide a pretrained video diffusion model with rendered 3DGS frames using spatial VGG loss + occlusion-aware mask, producing coherent novel views.</div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">STEP 04</div>
+          <div class="step-title">Back-Projection</div>
+          <div class="step-desc">Re-integrate refined 2D frames as pseudo-observations into the 3DGS scene, enabling iterative geometry densification and quality improvement.</div>
+        </div>
+      </div>
+
+      <!-- Pipeline diagram placeholder -->
+      <figure class="figure-wrap">
+        <!-- ★ REPLACE: insert your pipeline figure (Fig. 1 from the paper) -->
+        <div class="placeholder ph-diagram" style="height:400px;">
+          <span class="placeholder-icon">🔬</span>
+          <span class="placeholder-label">Pipeline Diagram (Figure 1)</span>
+          <span class="placeholder-sub">Replace with &lt;img src="static/pipeline.png" alt="SplatFusion Pipeline"&gt;</span>
+        </div>
+        <figcaption>
+          <strong>Figure 1.</strong> Overview of the SplatFusion pipeline. Starting from a coarse 3DGS representation
+          initialized with DUST3R/MASt3R, the SCTG module guides a pretrained video diffusion model to generate
+          spatially and temporally consistent novel views. These are back-projected to iteratively densify and correct
+          the 3D scene.
+        </figcaption>
+      </figure>
+
+      <!-- SCTG detail -->
+      <div style="margin-top:2.5rem; display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; align-items:start;">
+        <figure class="figure-wrap">
+          <!-- ★ REPLACE: SCTG detail figure (Fig. 2) -->
+          <div class="placeholder" style="height:300px;">
+            <span class="placeholder-icon">⚙️</span>
+            <span class="placeholder-label">SCTG Detail (Figure 2)</span>
+            <span class="placeholder-sub">&lt;img src="static/sctg.png"&gt;</span>
+          </div>
+          <figcaption>
+            <strong>SCTG Guidance.</strong> At each diffusion timestep, the current noisy sample is
+            aligned with 3DGS renderings via a perceptual VGG loss and an occlusion-aware L2 loss,
+            biasing generation toward scene-consistent outputs.
+          </figcaption>
+        </figure>
+
+        <figure class="figure-wrap">
+          <!-- ★ REPLACE: Camera trajectory figure (Fig. 3) -->
+          <div class="placeholder" style="height:300px;">
+            <span class="placeholder-icon">📷</span>
+            <span class="placeholder-label">Camera Trajectory (Figure 3)</span>
+            <span class="placeholder-sub">&lt;img src="static/trajectory.png"&gt;</span>
+          </div>
+          <figcaption>
+            <strong>Camera Trajectory Generation.</strong> Red markers indicate sparse input poses;
+            the blue curve shows the smooth B-spline trajectory of interpolated virtual cameras
+            (green markers) used to guide diffusion.
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       QUALITATIVE RESULTS
+  ═══════════════════════════════════════════════════════════════════ -->
+  <section id="results">
+    <div class="container">
+      <div class="section-label">03 — Results</div>
+      <h2>Qualitative Results</h2>
+
+      <!-- Key metrics strip -->
+      <div class="metrics-strip">
+        <div class="metric-cell">
+          <span class="metric-val">0.049</span>
+          <span class="metric-name">LPIPS ↓</span>
+          <span class="metric-note">DL3DV-10K</span>
+        </div>
+        <div class="metric-cell">
+          <span class="metric-val">0.870</span>
+          <span class="metric-name">SSIM ↑</span>
+          <span class="metric-note">DL3DV-10K</span>
+        </div>
+        <div class="metric-cell">
+          <span class="metric-val">30.52</span>
+          <span class="metric-name">PSNR ↑</span>
+          <span class="metric-note">DL3DV-10K</span>
+        </div>
+        <div class="metric-cell">
+          <span class="metric-val">0.705</span>
+          <span class="metric-name">Edge ↑</span>
+          <span class="metric-note">VLM Score</span>
+        </div>
+        <div class="metric-cell">
+          <span class="metric-val">0.542</span>
+          <span class="metric-name">Structure ↑</span>
+          <span class="metric-note">VLM Score</span>
+        </div>
+      </div>
+
+      <!-- Result videos grid -->
+      <div class="video-grid">
+        <figure class="video-item">
+          <!-- ★ REPLACE with <video autoplay loop muted playsinline src="static/result_1.mp4"></video> -->
+          <div class="placeholder ph-video">
+            <span class="placeholder-icon">🎥</span>
+            <span class="placeholder-label">Scene Result — Tanks & Temples</span>
+            <span class="placeholder-sub">&lt;video src="static/tanks_result.mp4"&gt;</span>
+          </div>
+          <figcaption>Tanks &amp; Temples — 3-view wide-baseline</figcaption>
+        </figure>
+        <figure class="video-item">
+          <div class="placeholder ph-video">
+            <span class="placeholder-icon">🎥</span>
+            <span class="placeholder-label">Scene Result — MipNeRF360</span>
+            <span class="placeholder-sub">&lt;video src="static/mip360_result.mp4"&gt;</span>
+          </div>
+          <figcaption>MipNeRF360 — 360° unbounded scene</figcaption>
+        </figure>
+        <figure class="video-item">
+          <div class="placeholder ph-video">
+            <span class="placeholder-icon">🎥</span>
+            <span class="placeholder-label">Scene Result — DL3DV-10K</span>
+            <span class="placeholder-sub">&lt;video src="static/dl3dv_result.mp4"&gt;</span>
+          </div>
+          <figcaption>DL3DV-10K — occlusion-heavy indoor</figcaption>
+        </figure>
+        <figure class="video-item">
+          <div class="placeholder ph-video">
+            <span class="placeholder-icon">🎥</span>
+            <span class="placeholder-label">Scene Result — MVImgNet</span>
+            <span class="placeholder-sub">&lt;video src="static/mvimgnet_result.mp4"&gt;</span>
+          </div>
+          <figcaption>MVImgNet — diverse outdoor scenes</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       VISUAL COMPARISONS
+  ═══════════════════════════════════════════════════════════════════ -->
+  <section id="comparisons">
+    <div class="container">
+      <div class="section-label">04 — Comparisons</div>
+      <h2>Comparison with Baselines</h2>
+
+      <p style="color:var(--ink-muted); font-size:0.88rem; margin-bottom:2rem; max-width:640px;">
+        We compare SplatFusion against InstantSplat, FSGS, SD-Inpainting, CF-3DGS, and DNGaussian under
+        extreme sparse-view conditions (2–3 wide-baseline images). Our method consistently preserves
+        geometry, fine details, and temporal coherence where baselines exhibit artifacts.
+      </p>
+
+      <!-- Column headers -->
+      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:0.5rem; margin-bottom:0.4rem;">
+        <div style="text-align:center; font-family:var(--font-mono); font-size:0.66rem; letter-spacing:0.07em; text-transform:uppercase; color:var(--ink-muted);">Input</div>
+        <div style="text-align:center; font-family:var(--font-mono); font-size:0.66rem; letter-spacing:0.07em; text-transform:uppercase; color:var(--ink-muted);">FSGS</div>
+        <div style="text-align:center; font-family:var(--font-mono); font-size:0.66rem; letter-spacing:0.07em; text-transform:uppercase; color:var(--ink-muted);">InstantSplat</div>
+        <div style="text-align:center; font-family:var(--font-mono); font-size:0.66rem; letter-spacing:0.07em; text-transform:uppercase; color:var(--ink-muted);">SD-Inpainting</div>
+        <div style="text-align:center; font-family:var(--font-mono); font-size:0.66rem; letter-spacing:0.07em; text-transform:uppercase; color:var(--accent); font-weight:500;">Ours</div>
+      </div>
+
+      <!-- Comparison rows — one per scene -->
+      <!-- ★ REPLACE: each placeholder div with an <img src="static/compare_row1_col1.png"> etc. -->
+
+      <!-- Row 1 -->
+      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:0.5rem; margin-bottom:0.8rem; align-items:start;">
+        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">Input</span></div>
+        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">FSGS</span></div>
+        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">InstantSplat</span></div>
+        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">SD-Inpainting</span></div>
+        <div class="placeholder ph-compare" style="border-color:var(--accent); opacity:0.9;"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub" style="color:var(--accent);">Ours</span></div>
+      </div>
+      <p style="font-size:0.78rem; color:var(--ink-faint); margin-bottom:1.5rem; font-style:italic;">Scene 1 — Tanks &amp; Temples (Truck)</p>
+
+      <!-- Row 2 -->
+      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:0.5rem; margin-bottom:0.8rem; align-items:start;">
+        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">Input</span></div>
+        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">FSGS</span></div>
+        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">InstantSplat</span></div>
+        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">SD-Inpainting</span></div>
+        <div class="placeholder ph-compare" style="border-color:var(--accent); opacity:0.9;"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub" style="color:var(--accent);">Ours</span></div>
+      </div>
+      <p style="font-size:0.78rem; color:var(--ink-faint); margin-bottom:1.5rem; font-style:italic;">Scene 2 — MipNeRF360 (Garden bench)</p>
+
+      <!-- Row 3 -->
+      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:0.5rem; margin-bottom:0.8rem; align-items:start;">
+        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">Input</span></div>
+        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">FSGS</span></div>
+        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">InstantSplat</span></div>
+        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">SD-Inpainting</span></div>
+        <div class="placeholder ph-compare" style="border-color:var(--accent); opacity:0.9;"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub" style="color:var(--accent);">Ours</span></div>
+      </div>
+      <p style="font-size:0.78rem; color:var(--ink-faint); margin-bottom:1.5rem; font-style:italic;">Scene 3 — MVImgNet (Outdoor)</p>
+
+      <!-- Wide vs Narrow baseline -->
+      <h3 style="font-family:var(--font-serif); font-size:1.15rem; font-weight:600; margin:2.5rem 0 1rem; color:var(--ink);">
+        Wide vs. Narrow Baseline
+      </h3>
+      <p style="color:var(--ink-muted); font-size:0.88rem; margin-bottom:1.5rem; max-width:580px;">
+        SplatFusion excels particularly under wide-baseline conditions (30°–60° separation) where competing methods
+        exhibit the most severe degradation.
+      </p>
+      <figure class="figure-wrap">
+        <!-- ★ REPLACE with your wide/narrow baseline comparison figure (Fig. 5) -->
+        <div class="placeholder" style="height:340px;">
+          <span class="placeholder-icon">↔️</span>
+          <span class="placeholder-label">Wide- vs. Narrow-Baseline Comparison (Figure 5)</span>
+          <span class="placeholder-sub">&lt;img src="static/baseline_compare.png"&gt;</span>
+        </div>
+        <figcaption>
+          <strong>Figure 5.</strong> Qualitative comparison under narrow- and wide-baseline conditions on
+          DL3DV-10K, Tanks &amp; Temples, and LLFF datasets. SplatFusion preserves geometry and fine
+          details in both settings; CF-3DGS and DNGaussian show distortions especially at wide baselines.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       CITATION
+  ═══════════════════════════════════════════════════════════════════ -->
+  <section id="citation" style="border-bottom:none;">
+    <div class="container">
+      <div class="section-label">05 — Citation</div>
+      <h2>BibTeX</h2>
+      <pre style="
+        background:var(--surface);
+        border:1px solid var(--border);
+        border-radius:8px;
+        padding:1.4rem 1.6rem;
+        font-family:var(--font-mono);
+        font-size:0.78rem;
+        line-height:1.8;
+        color:var(--ink-muted);
+        overflow-x:auto;
+        white-space:pre;
+      "><code>@article{younis2025splatfusion,
+  title     = {SplatFusion: Training-Free 3D Scene Completion
+               from Sparse Views Using Temporal Diffusion
+               Priors and Gaussian Splatting},
+  author    = {Younis, Tanveer and Khan, Dawar and Cheng, Zhanglin},
+  journal   = {arXiv preprint},
+  year      = {2025}
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════════════════════════════ -->
+  <footer>
+    <div class="container">
+      <p>
+        Page template inspired by <a href="https://nerfies.github.io" target="_blank">Nerfies</a> &nbsp;·&nbsp;
+        Supported by NSFC (U21A20515) and Guangdong Major Project of Basic and Applied Basic Research &nbsp;·&nbsp;
+        <a href="[PAPER_URL]">Paper</a>
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>
