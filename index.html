@@ -28,7 +28,7 @@
       --font-sans:   'DM Sans', sans-serif;
       --font-mono:   'DM Mono', monospace;
 
-      --max-w: 860px;
+      --max-w: 1160px;
       --col-gap: 2rem;
     }
 
@@ -518,30 +518,6 @@
       <div class="section-label">02 — Method</div>
       <h2>Pipeline Overview</h2>
 
-      <!-- Pipeline step cards -->
-      <div class="steps">
-        <div class="step-card">
-          <div class="step-num">STEP 01</div>
-          <div class="step-title">Geometry Initialization</div>
-          <div class="step-desc">Estimate camera poses and initialize a coarse 3DGS model from 2–3 unposed images via DUST3R / MASt3R geometric priors.</div>
-        </div>
-        <div class="step-card">
-          <div class="step-num">STEP 02</div>
-          <div class="step-title">Camera Trajectory</div>
-          <div class="step-desc">Construct a smooth B-spline camera trajectory that interpolates between sparse input poses to generate dense virtual viewpoints.</div>
-        </div>
-        <div class="step-card">
-          <div class="step-num">STEP 03</div>
-          <div class="step-title">SCTG Refinement</div>
-          <div class="step-desc">Guide a pretrained video diffusion model with rendered 3DGS frames using spatial VGG loss + occlusion-aware mask, producing coherent novel views.</div>
-        </div>
-        <div class="step-card">
-          <div class="step-num">STEP 04</div>
-          <div class="step-title">Back-Projection</div>
-          <div class="step-desc">Re-integrate refined 2D frames as pseudo-observations into the 3DGS scene, enabling iterative geometry densification and quality improvement.</div>
-        </div>
-      </div>
-
       <!-- Pipeline diagram placeholder -->
       <figure class="figure-wrap">
         <!-- ★ REPLACE: insert your pipeline figure (Fig. 1 from the paper) -->
@@ -681,47 +657,19 @@
         geometry, fine details, and temporal coherence where baselines exhibit artifacts.
       </p>
 
-      <!-- Column headers -->
-      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:0.5rem; margin-bottom:0.4rem;">
-        <div style="text-align:center; font-family:var(--font-mono); font-size:0.66rem; letter-spacing:0.07em; text-transform:uppercase; color:var(--ink-muted);">Input</div>
-        <div style="text-align:center; font-family:var(--font-mono); font-size:0.66rem; letter-spacing:0.07em; text-transform:uppercase; color:var(--ink-muted);">FSGS</div>
-        <div style="text-align:center; font-family:var(--font-mono); font-size:0.66rem; letter-spacing:0.07em; text-transform:uppercase; color:var(--ink-muted);">InstantSplat</div>
-        <div style="text-align:center; font-family:var(--font-mono); font-size:0.66rem; letter-spacing:0.07em; text-transform:uppercase; color:var(--ink-muted);">SD-Inpainting</div>
-        <div style="text-align:center; font-family:var(--font-mono); font-size:0.66rem; letter-spacing:0.07em; text-transform:uppercase; color:var(--accent); font-weight:500;">Ours</div>
-      </div>
-
-      <!-- Comparison rows — one per scene -->
-      <!-- ★ REPLACE: each placeholder div with an <img src="static/compare_row1_col1.png"> etc. -->
-
-      <!-- Row 1 -->
-      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:0.5rem; margin-bottom:0.8rem; align-items:start;">
-        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">Input</span></div>
-        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">FSGS</span></div>
-        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">InstantSplat</span></div>
-        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">SD-Inpainting</span></div>
-        <div class="placeholder ph-compare" style="border-color:var(--accent); opacity:0.9;"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub" style="color:var(--accent);">Ours</span></div>
-      </div>
-      <p style="font-size:0.78rem; color:var(--ink-faint); margin-bottom:1.5rem; font-style:italic;">Scene 1 — Tanks &amp; Temples (Truck)</p>
-
-      <!-- Row 2 -->
-      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:0.5rem; margin-bottom:0.8rem; align-items:start;">
-        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">Input</span></div>
-        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">FSGS</span></div>
-        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">InstantSplat</span></div>
-        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">SD-Inpainting</span></div>
-        <div class="placeholder ph-compare" style="border-color:var(--accent); opacity:0.9;"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub" style="color:var(--accent);">Ours</span></div>
-      </div>
-      <p style="font-size:0.78rem; color:var(--ink-faint); margin-bottom:1.5rem; font-style:italic;">Scene 2 — MipNeRF360 (Garden bench)</p>
-
-      <!-- Row 3 -->
-      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:0.5rem; margin-bottom:0.8rem; align-items:start;">
-        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">Input</span></div>
-        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">FSGS</span></div>
-        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">InstantSplat</span></div>
-        <div class="placeholder ph-compare"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub">SD-Inpainting</span></div>
-        <div class="placeholder ph-compare" style="border-color:var(--accent); opacity:0.9;"><span class="placeholder-icon" style="font-size:1rem;">🖼</span><span class="placeholder-sub" style="color:var(--accent);">Ours</span></div>
-      </div>
-      <p style="font-size:0.78rem; color:var(--ink-faint); margin-bottom:1.5rem; font-style:italic;">Scene 3 — MVImgNet (Outdoor)</p>
+      <!-- Single comparison figure -->
+      <figure class="figure-wrap">
+        <img src="static/fig4_comparison.png"
+             alt="Qualitative comparison of novel view synthesis results"
+             style="width:100%; border-radius:6px; border:1px solid var(--border);" />
+        <figcaption style="margin-top:1rem;">
+          <strong>Figure 4.</strong> Qualitative comparison of novel view synthesis results on the
+          <em>Tanks and Temples</em>, <em>MipNeRF360</em>, and <em>MVImgNet</em> datasets.
+          We compare against InstantSplat, Stable Diffusion Inpainting, and Few-Shot Gaussian Splatting (FSGS).
+          Under sparse-view conditions, prior methods produce artifacts, incomplete regions, or structurally
+          inconsistent renderings, while our method faithfully restores scene geometry and appearance.
+        </figcaption>
+      </figure>
 
       <!-- Wide vs Narrow baseline -->
       <h3 style="font-family:var(--font-serif); font-size:1.15rem; font-weight:600; margin:2.5rem 0 1rem; color:var(--ink);">
