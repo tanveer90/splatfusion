@@ -194,14 +194,16 @@
       text-transform: uppercase;
       color: var(--ink-faint);
       margin-bottom: 0.5rem;
+      text-align: center;
     }
     h2 {
       font-family: var(--font-sans);
       font-weight: 700;
-      font-size: 1.6rem;
+      font-size: 1.75rem;
       letter-spacing: -0.01em;
       color: var(--ink);
       margin-bottom: 1.5rem;
+      text-align: center;
     }
     h3 {
       font-family: var(--font-sans);
@@ -586,30 +588,17 @@
         </figcaption>
       </figure>
 
-      <!-- SCTG + Camera trajectory -->
-      <div class="two-col" style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; align-items:start;">
-        <figure class="figure-wrap">
-          <img src="static/sctg.png"
-               alt="SCTG Guidance Detail"
-               style="width:100%; border-radius:6px; border:1px solid var(--border);" />
-          <figcaption>
-            <strong>SCTG Guidance.</strong> At each diffusion timestep, the current noisy sample is
-            aligned with 3DGS renderings via a perceptual VGG loss and an occlusion-aware L2 loss,
-            biasing generation toward scene-consistent outputs.
-          </figcaption>
-        </figure>
-
-        <figure class="figure-wrap">
-          <img src="static/traj.png"
-               alt="Camera Trajectory Generation"
-               style="width:100%; border-radius:6px; border:1px solid var(--border);" />
-          <figcaption>
-            <strong>Camera Trajectory Generation.</strong> Red markers indicate sparse input poses;
-            the blue curve shows the smooth B-spline trajectory of interpolated virtual cameras
-            (green markers) used to guide diffusion.
-          </figcaption>
-        </figure>
-      </div>
+      <!-- SCTG detail — centered -->
+      <figure class="figure-wrap" style="max-width:700px; margin:0 auto;">
+        <img src="static/sctg.png"
+             alt="SCTG Guidance Detail"
+             style="width:100%; border-radius:6px; border:1px solid var(--border);" />
+        <figcaption>
+          <strong>SCTG Guidance.</strong> At each diffusion timestep, the current noisy sample is
+          aligned with 3DGS renderings via a perceptual VGG loss and an occlusion-aware L2 loss,
+          biasing generation toward scene-consistent outputs.
+        </figcaption>
+      </figure>
 
     </div>
   </section>
