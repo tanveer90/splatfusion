@@ -412,6 +412,89 @@
   </header>
 
   <!-- ═══════════════════════════════════════════════════════════════
+       TL;DR + VIDEO PLACEHOLDER
+  ═══════════════════════════════════════════════════════════════════ -->
+  <section style="padding: 2.5rem 0; border-bottom: 1px solid var(--border);">
+    <div class="container">
+
+      <!-- TL;DR -->
+      <p style="
+        font-family: var(--font-sans);
+        font-size: 1.05rem;
+        color: var(--ink);
+        line-height: 1.75;
+        margin-bottom: 2.2rem;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: left;
+      ">
+        <strong>TL;DR:</strong> We introduce <strong>SplatFusion</strong>, a training-free framework
+        that reconstructs complete 3D scenes from as few as <strong>2–3 wide-baseline images</strong>
+        using pretrained video diffusion priors — no per-scene optimization, no fine-tuning required.
+      </p>
+
+      <!-- Video placeholder -->
+      <div style="
+        max-width: 900px;
+        margin: 0 auto;
+        background: #111;
+        border-radius: 10px;
+        overflow: hidden;
+        aspect-ratio: 16/9;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        position: relative;
+      ">
+        <!-- Play icon -->
+        <div style="
+          width: 64px; height: 64px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.15);
+          border: 2px solid rgba(255,255,255,0.4);
+          display: flex; align-items: center; justify-content: center;
+        ">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+            <polygon points="5,3 19,12 5,21"/>
+          </svg>
+        </div>
+        <p style="
+          font-family: var(--font-sans);
+          font-size: 0.9rem;
+          color: rgba(255,255,255,0.5);
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+        ">Video Results</p>
+    
+             <video autoplay muted loop playsinline style="width:100%;">
+               <source src="static/demo_video.mp4" type="video/mp4">
+             </video>
+      
+      </div>
+
+      <!-- Caption below video -->
+      <p style="
+        font-family: var(--font-sans);
+        font-size: 0.84rem;
+        color: var(--ink-muted);
+        text-align: center;
+        margin-top: 0.9rem;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+      ">
+        <strong>Novel-View Synthesis Results.</strong>
+        SplatFusion reconstructs photorealistic 3D scenes from 2–3 sparse wide-baseline images
+        without any training or fine-tuning of diffusion models.
+      </p>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
        TEASER / HERO IMAGE
   ═══════════════════════════════════════════════════════════════════ -->
   <section style="padding: 3rem 0;">
