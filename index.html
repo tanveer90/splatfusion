@@ -568,7 +568,7 @@
           <div class="placeholder" style="height:300px;">
             <span class="placeholder-icon">⚙️</span>
             <span class="placeholder-label">SCTG Detail (Figure 2)</span>
-            <span class="placeholder-sub">&lt;img src="static/sctg.png"&gt;</span>
+            <img src="static/baran.png" alt="SCTG Detail">
           </div>
           <figcaption>
             <strong>SCTG Guidance.</strong> At each diffusion timestep, the current noisy sample is
@@ -582,7 +582,7 @@
           <div class="placeholder" style="height:300px;">
             <span class="placeholder-icon">📷</span>
             <span class="placeholder-label">Camera Trajectory (Figure 3)</span>
-            <span class="placeholder-sub">&lt;img src="static/trajectory.png"&gt;</span>
+            <img src="static/traj.png" alt="Camera Trajectory">
           </div>
           <figcaption>
             <strong>Camera Trajectory Generation.</strong> Red markers indicate sparse input poses;
@@ -631,11 +631,11 @@
         </div>
       </div>
 
-      <!-- Result videos grid -->
-      <div class="video-grid">
-        <figure class="video-item">
+      <!-- <!-- Result videos grid -->
+      <!-- <div class="video-grid">
+        <figure class="video-item"> -->
           <!-- ★ REPLACE with <video autoplay loop muted playsinline src="static/result_1.mp4"></video> -->
-          <div class="placeholder ph-video">
+          <!-- <div class="placeholder ph-video">
             <span class="placeholder-icon">🎥</span>
             <span class="placeholder-label">Scene Result — Tanks & Temples</span>
             <span class="placeholder-sub">&lt;video src="static/tanks_result.mp4"&gt;</span>
@@ -668,7 +668,7 @@
         </figure>
       </div>
     </div>
-  </section>
+  </section> --> 
 
   <!-- ═══════════════════════════════════════════════════════════════
        VISUAL COMPARISONS
@@ -706,15 +706,15 @@
         SplatFusion excels particularly under wide-baseline conditions (30°–60° separation) where competing methods
         exhibit the most severe degradation.
       </p>
-      <figure class="figure-wrap">
-        <!-- ★ REPLACE with your wide/narrow baseline comparison figure (Fig. 5) -->
-<img src = "static/baran.png">
-        </div>
-        <figcaption>
-          <strong>Figure 5.</strong> Qualitative comparison under narrow- and wide-baseline conditions on
-          DL3DV-10K, Tanks &amp; Temples, and LLFF datasets. SplatFusion preserves geometry and fine
-          details in both settings; CF-3DGS and DNGaussian show distortions especially at wide baselines.
-        </figcaption>
+<figure class="figure-wrap">
+  <!-- ★ REPLACE with your wide/narrow baseline comparison figure (Fig. 5) -->
+  <img src="static/baran.png" alt="Wide vs Narrow Baseline Comparison">
+  <figcaption>
+    <strong>Figure 5.</strong> Qualitative comparison under narrow- and wide-baseline conditions on
+    DL3DV-10K, Tanks &amp; Temples, and LLFF datasets. SplatFusion preserves geometry and fine
+    details in both settings; CF-3DGS and DNGaussian show distortions especially at wide baselines.
+  </figcaption>
+</figure>
       </figure>
     </div>
   </section>
