@@ -196,19 +196,26 @@
       margin-bottom: 0.5rem;
     }
     h2 {
-      font-family: var(--font-serif);
-      font-weight: 400;
+      font-family: var(--font-sans);
+      font-weight: 700;
       font-size: 1.6rem;
       letter-spacing: -0.01em;
       color: var(--ink);
       margin-bottom: 1.5rem;
     }
+    h3 {
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 1.15rem;
+      color: var(--ink);
+      margin: 2.5rem 0 1rem;
+    }
 
     /* ─── ABSTRACT ───────────────────────────────────────────────── */
     .abstract-body {
       font-family: var(--font-sans);
-      font-size: 1.05rem;
-      line-height: 1.85;
+      font-size: 1.0rem;
+      line-height: 1.9;
       color: var(--ink);
       max-width: 100%;
       text-align: justify;
@@ -252,9 +259,9 @@
       font-family: var(--font-sans);
       font-size: 0.84rem;
       color: var(--ink-muted);
-      line-height: 1.6;
+      line-height: 1.65;
     }
-    .figure-wrap figcaption strong { color: var(--ink); font-weight: 500; }
+    .figure-wrap figcaption strong { color: var(--ink); font-weight: 600; }
 
     /* Placeholder boxes */
     .placeholder {
@@ -308,9 +315,9 @@
     }
     .metric-cell:last-child { border-right: none; }
     .metric-val {
-      font-family: var(--font-serif);
+      font-family: var(--font-sans);
       font-size: 1.6rem;
-      font-weight: 400;
+      font-weight: 700;
       color: var(--accent);
       display: block;
       line-height: 1;
@@ -582,7 +589,7 @@
       <!-- SCTG + Camera trajectory -->
       <div class="two-col" style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; align-items:start;">
         <figure class="figure-wrap">
-          <img src="static/baran.png"
+          <img src="static/sctg.png"
                alt="SCTG Guidance Detail"
                style="width:100%; border-radius:6px; border:1px solid var(--border);" />
           <figcaption>
@@ -676,9 +683,7 @@
       </figure>
 
       <!-- Wide vs Narrow baseline -->
-      <h3 style="font-family:var(--font-serif); font-size:1.15rem; font-weight:400; margin:0 0 1rem; color:var(--ink);">
-        Wide vs. Narrow Baseline
-      </h3>
+      <h3>Wide vs. Narrow Baseline</h3>
       <p style="color:var(--ink-muted); font-family:var(--font-sans); font-size:0.9rem; margin-bottom:1.5rem; max-width:580px; line-height:1.7;">
         SplatFusion excels particularly under wide-baseline conditions (30°–60° separation) where competing
         methods exhibit the most severe degradation.
