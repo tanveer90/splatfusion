@@ -229,12 +229,6 @@
     }
 
     /* ─── HIGHLIGHT PILLS ────────────────────────────────────────── */
-    .highlights {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-      margin-top: 1.8rem;
-    }
     .pill {
       font-family: var(--font-mono);
       font-size: 0.72rem;
@@ -264,41 +258,6 @@
       line-height: 1.65;
     }
     .figure-wrap figcaption strong { color: var(--ink); font-weight: 600; }
-
-    /* Placeholder boxes */
-    .placeholder {
-      width: 100%;
-      background: var(--surface);
-      border: 2px dashed var(--border);
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      color: var(--ink-faint);
-      font-family: var(--font-mono);
-      font-size: 0.78rem;
-      letter-spacing: 0.04em;
-      transition: border-color 0.2s;
-      position: relative;
-      overflow: hidden;
-    }
-    .placeholder::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(
-        -45deg,
-        transparent,
-        transparent 8px,
-        rgba(0,0,0,0.018) 8px,
-        rgba(0,0,0,0.018) 16px
-      );
-    }
-    .placeholder:hover { border-color: var(--accent); }
-    .placeholder-icon { font-size: 1.6rem; position: relative; z-index: 1; }
-    .placeholder-label { position: relative; z-index: 1; text-align: center; padding: 0 1rem; }
 
     /* ─── METRICS STRIP ──────────────────────────────────────────── */
     .metrics-strip {
@@ -337,40 +296,6 @@
       font-size: 0.7rem;
       color: var(--ink-faint);
       display: block;
-    }
-
-    /* ─── PIPELINE STEPS ─────────────────────────────────────────── */
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-      gap: 1.2rem;
-      margin-bottom: 2.5rem;
-    }
-    .step-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.2rem 1.1rem;
-    }
-    .step-num {
-      font-family: var(--font-mono);
-      font-size: 0.68rem;
-      letter-spacing: 0.1em;
-      color: var(--accent);
-      margin-bottom: 0.5rem;
-    }
-    .step-title {
-      font-family: var(--font-sans);
-      font-weight: 500;
-      font-size: 0.9rem;
-      color: var(--ink);
-      margin-bottom: 0.4rem;
-    }
-    .step-desc {
-      font-family: var(--font-sans);
-      font-size: 0.8rem;
-      color: var(--ink-muted);
-      line-height: 1.55;
     }
 
     /* ─── CONTRIBUTION CARDS ─────────────────────────────────────── */
@@ -651,7 +576,7 @@
       <div class="section-label">04 — Comparisons</div>
       <h2>Comparison with Baselines</h2>
 
-      <p style="color:var(--ink-muted); font-family:var(--font-sans); font-size:0.9rem; margin-bottom:2rem; max-width:640px; line-height:1.7;">
+      <p style="color:var(--ink-muted); font-family:var(--font-sans); font-size:0.9rem; margin:0 auto 2rem; max-width:640px; line-height:1.7; text-align:center;">
         We compare SplatFusion against InstantSplat, FSGS, SD-Inpainting, CF-3DGS, and DNGaussian under
         extreme sparse-view conditions (2–3 wide-baseline images). Our method consistently preserves
         geometry, fine details, and temporal coherence where baselines exhibit artifacts.
